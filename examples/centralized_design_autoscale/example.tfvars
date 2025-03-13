@@ -1,20 +1,18 @@
 ### General
 region      = "eu-west-1" # TODO: update here
-name_prefix = "example-"  # TODO: update here
+name_prefix = "Axity-"  # TODO: update here
 
 global_tags = {
-  ManagedBy   = "terraform"
-  Application = "Palo Alto Networks VM-Series NGFW"
-  Owner       = "PS Team"
+  "Proveedor"     = "Axity"
 }
 
-ssh_key_name = "example-ssh-key" # TODO: update here
+ssh_key_name = "ssh-key" # TODO: update here
 
 ### VPC
 vpcs = {
   security_vpc = {
     name = "security-vpc"
-    cidr = "10.100.0.0/16"
+    cidr = "10.100.0.0/25"
     nacls = {
       trusted_path_monitoring = {
         name = "trusted-path-monitoring"
@@ -24,7 +22,7 @@ vpcs = {
             egress      = true
             protocol    = "icmp"
             rule_action = "deny"
-            cidr_block  = "10.100.1.0/24"
+            cidr_block  = "10.100.1.0/28"
             from_port   = null
             to_port     = null
           }
@@ -33,7 +31,7 @@ vpcs = {
             egress      = true
             protocol    = "icmp"
             rule_action = "deny"
-            cidr_block  = "10.100.65.0/24"
+            cidr_block  = "10.100.65.0/28"
             from_port   = null
             to_port     = null
           }
@@ -71,14 +69,14 @@ vpcs = {
             description = "Permit GENEVE to GWLB subnets"
             type        = "ingress", from_port = "6081", to_port = "6081", protocol = "udp"
             cidr_blocks = [
-              "10.100.5.0/24", "10.100.69.0/24"
+              "10.100.5.0/28", "10.100.69.0/28"
             ]
           }
           health_probe = {
             description = "Permit Port 80 Health Probe to GWLB subnets"
             type        = "ingress", from_port = "80", to_port = "80", protocol = "tcp"
             cidr_blocks = [
-              "10.100.5.0/24", "10.100.69.0/24"
+              "10.100.5.0/28", "10.100.69.0/28"
             ]
           }
         }
@@ -121,37 +119,37 @@ vpcs = {
           ssh = {
             description = "Permit SSH"
             type        = "ingress", from_port = "22", to_port = "22", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
           https = {
             description = "Permit HTTPS"
             type        = "ingress", from_port = "443", to_port = "443", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
           http = {
             description = "Permit HTTP"
             type        = "ingress", from_port = "80", to_port = "80", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
           health_probe_8081 = {
             description = "Permit Port 8081 Health Probe to ALB"
             type        = "ingress", from_port = "8081", to_port = "8081", protocol = "tcp"
-            cidr_blocks = ["10.100.6.0/24", "10.100.70.0/24"]
+            cidr_blocks = ["10.100.6.0/28", "10.100.70.0/28"]
           }
           health_probe_8082 = {
             description = "Permit Port 8082 Health Probe to ALB"
             type        = "ingress", from_port = "8082", to_port = "8082", protocol = "tcp"
-            cidr_blocks = ["10.100.6.0/24", "10.100.70.0/24"]
+            cidr_blocks = ["10.100.6.0/28", "10.100.70.0/28"]
           }
           health_probe_2021 = {
             description = "Permit Port 2021 Health Probe to NLB"
             type        = "ingress", from_port = "2021", to_port = "2021", protocol = "tcp"
-            cidr_blocks = ["10.100.7.0/24", "10.100.71.0/24"]
+            cidr_blocks = ["10.100.7.0/28", "10.100.71.0/28"]
           }
           health_probe_2022 = {
             description = "Permit Port 2022 Health Probe to NLB"
             type        = "ingress", from_port = "2022", to_port = "2022", protocol = "tcp"
-            cidr_blocks = ["10.100.7.0/24", "10.100.71.0/24"]
+            cidr_blocks = ["10.100.7.0/28", "10.100.71.0/28"]
           }
         }
       }
@@ -177,24 +175,24 @@ vpcs = {
       }
     }
     subnets = {
-      "10.100.0.0/24"  = { az = "eu-west-1a", subnet_group = "mgmt", nacl = null }
-      "10.100.64.0/24" = { az = "eu-west-1b", subnet_group = "mgmt", nacl = null }
-      "10.100.1.0/24"  = { az = "eu-west-1a", subnet_group = "private", nacl = "trusted_path_monitoring" }
-      "10.100.65.0/24" = { az = "eu-west-1b", subnet_group = "private", nacl = "trusted_path_monitoring" }
-      "10.100.2.0/24"  = { az = "eu-west-1a", subnet_group = "public", nacl = null }
-      "10.100.66.0/24" = { az = "eu-west-1b", subnet_group = "public", nacl = null }
-      "10.100.3.0/24"  = { az = "eu-west-1a", subnet_group = "tgw_attach", nacl = null }
-      "10.100.67.0/24" = { az = "eu-west-1b", subnet_group = "tgw_attach", nacl = null }
-      "10.100.4.0/24"  = { az = "eu-west-1a", subnet_group = "gwlbe_outbound", nacl = null }
-      "10.100.68.0/24" = { az = "eu-west-1b", subnet_group = "gwlbe_outbound", nacl = null }
-      "10.100.5.0/24"  = { az = "eu-west-1a", subnet_group = "gwlb", nacl = null }
-      "10.100.69.0/24" = { az = "eu-west-1b", subnet_group = "gwlb", nacl = null } # AWS reccomends to always go up to the last possible AZ for GWLB service
-      "10.100.10.0/24" = { az = "eu-west-1a", subnet_group = "gwlbe_eastwest", nacl = null }
-      "10.100.74.0/24" = { az = "eu-west-1b", subnet_group = "gwlbe_eastwest", nacl = null }
-      "10.100.6.0/24"  = { az = "eu-west-1a", subnet_group = "alb", nacl = null }
-      "10.100.70.0/24" = { az = "eu-west-1b", subnet_group = "alb", nacl = null }
-      "10.100.7.0/24"  = { az = "eu-west-1a", subnet_group = "nlb", nacl = null }
-      "10.100.71.0/24" = { az = "eu-west-1b", subnet_group = "nlb", nacl = null }
+      "10.100.0.0/28"  = { az = "eu-west-1a", subnet_group = "mgmt", nacl = null }
+      "10.100.64.0/28" = { az = "eu-west-1b", subnet_group = "mgmt", nacl = null }
+      "10.100.1.0/28"  = { az = "eu-west-1a", subnet_group = "private", nacl = "trusted_path_monitoring" }
+      "10.100.65.0/28" = { az = "eu-west-1b", subnet_group = "private", nacl = "trusted_path_monitoring" }
+      "10.100.2.0/28"  = { az = "eu-west-1a", subnet_group = "public", nacl = null }
+      "10.100.66.0/28" = { az = "eu-west-1b", subnet_group = "public", nacl = null }
+      "10.100.3.0/28"  = { az = "eu-west-1a", subnet_group = "tgw_attach", nacl = null }
+      "10.100.67.0/28" = { az = "eu-west-1b", subnet_group = "tgw_attach", nacl = null }
+      "10.100.4.0/28"  = { az = "eu-west-1a", subnet_group = "gwlbe_outbound", nacl = null }
+      "10.100.68.0/28" = { az = "eu-west-1b", subnet_group = "gwlbe_outbound", nacl = null }
+      "10.100.5.0/28"  = { az = "eu-west-1a", subnet_group = "gwlb", nacl = null }
+      "10.100.69.0/28" = { az = "eu-west-1b", subnet_group = "gwlb", nacl = null } # AWS reccomends to always go up to the last possible AZ for GWLB service
+      "10.100.10.0/28" = { az = "eu-west-1a", subnet_group = "gwlbe_eastwest", nacl = null }
+      "10.100.74.0/28" = { az = "eu-west-1b", subnet_group = "gwlbe_eastwest", nacl = null }
+      "10.100.6.0/28"  = { az = "eu-west-1a", subnet_group = "alb", nacl = null }
+      "10.100.70.0/28" = { az = "eu-west-1b", subnet_group = "alb", nacl = null }
+      "10.100.7.0/28"  = { az = "eu-west-1a", subnet_group = "nlb", nacl = null }
+      "10.100.71.0/28" = { az = "eu-west-1b", subnet_group = "nlb", nacl = null }
     }
     routes = {
       # Value of `next_hop_key` must match keys use to create TGW attachment, IGW, GWLB endpoint or other resources
@@ -209,7 +207,7 @@ vpcs = {
       mgmt_panorama = {
         vpc           = "security_vpc"
         subnet_group  = "mgmt"
-        to_cidr       = "10.255.0.0/16"
+        to_cidr       = "10.255.0.0/25"
         next_hop_key  = "security"
         next_hop_type = "transit_gateway_attachment"
       }
@@ -258,14 +256,14 @@ vpcs = {
       private_app1 = {
         vpc           = "security_vpc"
         subnet_group  = "private"
-        to_cidr       = "10.104.0.0/16"
+        to_cidr       = "10.104.0.0/25"
         next_hop_key  = "security"
         next_hop_type = "transit_gateway_attachment"
       }
       private_app2 = {
         vpc           = "security_vpc"
         subnet_group  = "private"
-        to_cidr       = "10.105.0.0/16"
+        to_cidr       = "10.105.0.0/25"
         next_hop_key  = "security"
         next_hop_type = "transit_gateway_attachment"
       }
@@ -287,7 +285,7 @@ vpcs = {
   }
   app1_vpc = {
     name  = "app1-spoke-vpc"
-    cidr  = "10.104.0.0/16"
+    cidr  = "10.104.0.0/25"
     nacls = {}
     security_groups = {
       app1_vm = {
@@ -306,26 +304,26 @@ vpcs = {
           ssh = {
             description = "Permit SSH"
             type        = "ingress", from_port = "22", to_port = "22", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
           https = {
             description = "Permit HTTPS"
             type        = "ingress", from_port = "443", to_port = "443", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
           http = {
             description = "Permit HTTP"
             type        = "ingress", from_port = "80", to_port = "80", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
         }
       }
     }
     subnets = {
-      "10.104.0.0/24"   = { az = "eu-west-1a", subnet_group = "app1_vm", nacl = null }
-      "10.104.128.0/24" = { az = "eu-west-1b", subnet_group = "app1_vm", nacl = null }
-      "10.104.2.0/24"   = { az = "eu-west-1a", subnet_group = "app1_lb", nacl = null }
-      "10.104.130.0/24" = { az = "eu-west-1b", subnet_group = "app1_lb", nacl = null }
+      "10.104.0.0/28"   = { az = "eu-west-1a", subnet_group = "app1_vm", nacl = null }
+      "10.104.128.0/28" = { az = "eu-west-1b", subnet_group = "app1_vm", nacl = null }
+      "10.104.2.0/28"   = { az = "eu-west-1a", subnet_group = "app1_lb", nacl = null }
+      "10.104.130.0/28" = { az = "eu-west-1b", subnet_group = "app1_lb", nacl = null }
     }
     routes = {
       # Value of `next_hop_key` must match keys use to create TGW attachment, IGW, GWLB endpoint or other resources
@@ -348,7 +346,7 @@ vpcs = {
   }
   app2_vpc = {
     name  = "app2-spoke-vpc"
-    cidr  = "10.105.0.0/16"
+    cidr  = "10.105.0.0/25"
     nacls = {}
     security_groups = {
       app2_vm = {
@@ -367,26 +365,26 @@ vpcs = {
           ssh = {
             description = "Permit SSH"
             type        = "ingress", from_port = "22", to_port = "22", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
           https = {
             description = "Permit HTTPS"
             type        = "ingress", from_port = "443", to_port = "443", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
           http = {
             description = "Permit HTTP"
             type        = "ingress", from_port = "80", to_port = "80", protocol = "tcp"
-            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/16", "10.105.0.0/16"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
+            cidr_blocks = ["1.1.1.1/32", "10.104.0.0/25", "10.105.0.0/25"] # TODO: update here (replace 1.1.1.1/32 with your IP range)
           }
         }
       }
     }
     subnets = {
-      "10.105.0.0/24"   = { az = "eu-west-1a", subnet_group = "app2_vm", nacl = null }
-      "10.105.128.0/24" = { az = "eu-west-1b", subnet_group = "app2_vm", nacl = null }
-      "10.105.2.0/24"   = { az = "eu-west-1a", subnet_group = "app2_lb", nacl = null }
-      "10.105.130.0/24" = { az = "eu-west-1b", subnet_group = "app2_lb", nacl = null }
+      "10.105.0.0/28"   = { az = "eu-west-1a", subnet_group = "app2_vm", nacl = null }
+      "10.105.128.0/28" = { az = "eu-west-1b", subnet_group = "app2_vm", nacl = null }
+      "10.105.2.0/28"   = { az = "eu-west-1a", subnet_group = "app2_lb", nacl = null }
+      "10.105.130.0/28" = { az = "eu-west-1b", subnet_group = "app2_lb", nacl = null }
     }
     routes = {
       # Value of `next_hop_key` must match keys use to create TGW attachment, IGW, GWLB endpoint or other resources
@@ -657,7 +655,7 @@ vmseries_asgs = {
 ### PANORAMA
 panorama_attachment = {
   transit_gateway_attachment_id = null            # TODO: update here
-  vpc_cidr                      = "10.255.0.0/24" # TODO: update here
+  vpc_cidr                      = "10.255.0.0/28" # TODO: update here
 }
 
 ### SPOKE VMS
